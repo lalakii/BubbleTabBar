@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFF</color>
+    <color name="blank">#696969</color>
+
+    <color name="home">#e74c3c</color>
+    <color name="logger">#673AB7</color>
+    <color name="documents">#3498db</color>
+    <color name="settings">#2ecc71</color>
+</resources>
