@@ -1,0 +1,107 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'org.jlleitschuh.gradle.ktlint'
+    id 'maven-publish'
+    id 'signing'
+}
+repositories {
+    mavenCentral()
+    google()
+}
+
+android {
+    compileSdk 34
+    namespace "io.ak1.bubbletabbar"
+    defaultConfig {
+        minSdkVersion 26
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            isDefault true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.google.com' }
+}
+
+dependencies {
+    implementation("androidx.annotation:annotation:1.8.0")
+}
+tasks.configureEach {
+    def taskName = it.name.toLowerCase()
+    if (taskName.contains("aarmetadata") || taskName.contains("debug") || it instanceof Javadoc)
+        it.enabled = false
+}
+afterEvaluate {
+    publishing {
+        repositories {
+            def publishToLocal = true
+            maven {
+                if (publishToLocal) {
+                    url = "D:\\repo\\"
+                } else {
+                    url = System.getenv("MAVEN_PUBLISH_URL")
+                    credentials {
+                        username = System.getenv("MAVEN_USER_NAME")
+                        password = System.getenv("MAVEN_PUBLISH_PASSWORD")
+                    }
+                }
+            }
+        }
+        publications {
+            release(MavenPublication) {
+                artifact(tasks.named("bundleReleaseAar"))
+                def finalUrl = "https://github.com/lalakii/BubbleTabBar"
+                def projectUrl = "https://github.com/akshay2211/BubbleTabBar"
+                pom {
+                    name = artifactId
+                    artifactId = artifactId
+                    groupId = "cn.lalaki"
+                    version = android.defaultConfig.versionName
+                    description = 'BubbleTabBar is a bottom navigation bar with customizable bubble-like tabs, forked from: ' + projectUrl
+                    url = finalUrl
+                    licenses {
+                        license {
+                            name = "The Apache Software License, Version 2.0"
+                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        }
+                    }
+                    developers {
+                        developer {
+                            name = 'lalakii'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:' + finalUrl + '.git'
+                        url = finalUrl
+                    }
+                    organization {
+                        name = "lalaki.cn"
+                        url = finalUrl
+                    }
+                }
+            }
+        }
+    }
+    signing {
+        useGpgCmd()
+        sign publishing.publications.release
+    }
+}
